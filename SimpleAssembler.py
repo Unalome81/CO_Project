@@ -16,7 +16,7 @@ def decimal_binary(n):
     res=0
     pow=0
     while(n>0):
-        res=res+ + (n%2)*(10**pow)
+        res=res+ (n%2)*(10**pow)
         pow+=1
         n=n//2
     num=str(res)
