@@ -200,22 +200,22 @@ if(error==0):
         else:
             sys.stdout.write(Output[i])
 elif (error==1):
-    print("Syntax error in line",i+1) #done
+    print("Syntax error in line",i+1) 
 elif (error==2):
-    print("Variable not declared in line",i+1) #done
+    print("Variable not declared in line",i+1) 
 elif (error==3):
-    print("Label not declared in line",i+1) #done
+    print("Label not declared in line",i+1) 
 elif (error==4):
-    print("Illegal use of flags in line", i+1) #done
+    print("Illegal use of flags in line", i+1) 
 elif (error==5):
-    print("Illegal immediate values in line",i+1) #done
+    print("Illegal immediate values in line",i+1) 
 elif (error==6):
-    print("Misuse of lables in line",i+1) #done
+    print("Misuse of lables in line",i+1) 
 elif (error==7):
-    print("Variables not declared in the beginning") #done
+    print("Variables not declared in the beginning") 
 elif (error==8):
-    print("missing halt instructions") #done
+    print("missing halt instructions") 
 elif (error==9):
-    print("Halt instruction not being used in the last") #done
+    print("Halt instruction not being used in the last") 
 elif (error==10):
     print("Invalid variable name")
