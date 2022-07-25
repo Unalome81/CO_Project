@@ -1,5 +1,5 @@
 import sys
-Inst = {"add":"10000", "sub":"10001", "mov":"10010", "ld":"10100", "st":"10101", "mul":"10110", "div":"10111",
+Inst = {"add":"10000", "sub":"10001", "mov":"", "movi":"10010", "movr":"10011", "ld":"10100", "st":"10101", "mul":"10110", "div":"10111",
     "rs":"11000", "ls":"11001", "xor":"11010", "or":"11011", "and":"11100", "not":"11101", "cmp":"11110", 
     "jmp":"11111", "jlt":"01100", "jgt":"01101", "je":"01111", "hlt":"01010"}
     
@@ -92,7 +92,13 @@ for i in range(0, len(S)):
             break  
         else:
             var_flag=1
-            res+=Inst[op]
+            if op!="mov":
+                res+=Inst[op]
+            else:
+                if L[2][0]=="$":
+                    res+=Inst["movi"]
+                else:
+                    res+=Inst["movr"]
             if op in A:
                 if(len(L)!=4):
                     error=1
