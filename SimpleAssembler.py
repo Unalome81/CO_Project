@@ -12,7 +12,29 @@ D=["ld", "st"]
 E=["jlt", "jmp", "jgt", "je"] #3 unused bits
 F=["hlt"] #11 unused bits
 
-def float_converter(n):
+def bit_extender(s, size):
+    diff=size-len(s)
+    s=("0"*diff)+s
+    return s
+
+def binary_decimal(n): 
+    n=str(n)
+    pow=len(n)-1
+    res=0
+    for i in n:
+        res+=(2**pow)*int(i)
+        pow-=1
+    return res
+
+def ieee_decimal(n):
+    exp=binary_decimal(n[0:3])
+    num=binary_decimal("1"+n[3:8])
+    shift=exp-5
+    res=num*pow(2, shift)
+    return res    
+
+def decimal_ieee(n): #Bit extender
+    float(n)
     f=n%1
     w=n//1
     w=bin(int(w))
@@ -28,7 +50,36 @@ def float_converter(n):
             x+="0"
     y=""
     y+=str(w)+"."+x
-    return y
+    pos=y.index(".")
+    exp=bin(pos-1)
+    exp=exp[2:]
+    exp=str(exp)
+    diff=3-len(exp)
+    exp="0"*diff + exp
+    res=""
+    y=y.replace(".","")
+    z=""
+    if len(y[1:6])<5:
+        z+=y[1:6]+str(0*(5-len(y[1:6])))
+    res=res+exp+z
+    return res    
+# def float_converter(n):
+#     f=n%1
+#     w=n//1
+#     w=bin(int(w))
+#     w=w[2:]
+#     x=""
+#     for i in range(0,4):
+#         f*=2
+#         if f>=1:
+#             f=f%1
+#             x+="1"
+#         else:
+#             f*=2
+#             x+="0"
+#     y=""
+#     y+=str(w)+"."+x
+#     return y
 
 def isfloat(str):
     check=1
@@ -39,15 +90,15 @@ def isfloat(str):
     return check
 
 
-def float_ieee(f):
-    pos=f.index(".")
-    f=f[1:6]
-    exp=bin(pos-1)
-    exp=exp[2:]
-    diff=3-len(exp)
-    exp="0"*diff + exp
-    res=exp + f[0:pos] + f[pos+1:]
-    return res
+# def float_ieee(f):
+#     pos=f.index(".")
+#     f=f[1:6]
+#     exp=bin(pos-1)
+#     exp=exp[2:]
+#     diff=3-len(exp)
+#     exp="0"*diff + exp
+#     res=exp + f[0:pos] + f[pos+1:]
+#     return res
 
 def decimal_binary(n):
     res=0
@@ -162,6 +213,7 @@ for i in range(0, len(S)):
                         error=5
                         break
             elif op in B or op in C:
+        
                 if(len(L)!=3):
                     error=1
                     break
@@ -181,6 +233,11 @@ for i in range(0, len(S)):
                             error=1
                             break
                         elif (int(L[2][1::])>255 or int(L[2][1::])<0):
+                            error=5
+                            break
+                        temp1=ieee_decimal(float(j[1::]))
+                        temp2=decimal_ieee(temp2)
+                        if temp2!=j[1::]:
                             error=5
                             break
                     else:
@@ -226,7 +283,8 @@ for i in range(0, len(S)):
             for j in L:
                 if j!=op:
                     if j[0]=="$" and L[0]=="movf":
-                        res+=float_ieee(float_converter(float(j[1::])))
+                        res+=decimal_ieee(float(j[1::]))
+
                     elif j[0]=="$" and L[0]!="movf":
                         res+=decimal_binary(int(j[1::]))
                     elif j in Var:
