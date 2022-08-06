@@ -1,16 +1,53 @@
 import sys
 Inst = {"add":"10000", "sub":"10001", "mov":"", "movi":"10010", "movr":"10011", "ld":"10100", "st":"10101", "mul":"10110", "div":"10111",
     "rs":"11000", "ls":"11001", "xor":"11010", "or":"11011", "and":"11100", "not":"11101", "cmp":"11110", 
-    "jmp":"11111", "jlt":"01100", "jgt":"01101", "je":"01111", "hlt":"01010"}
+    "jmp":"11111", "jlt":"01100", "jgt":"01101", "je":"01111", "hlt":"01010","addf":"00000","subf":"00001","movf":"00010"}
     
 Reg ={"R0":"000", "R1":"001", "R2":"010", "R3":"011", "R4":"100", "R5":"101", "R6":"110", "FLAGS":"111"}
 
-A=["add", "sub", "mul", "xor", "or", "and"] #2 unused bits
-B=["mov", "ls", "rs"]
+A=["add", "sub", "mul", "xor", "or", "and","addf","subf"] #2 unused bits
+B=["mov", "ls", "rs","movf"]
 C=["cmp", "mov", "not", "div"] #5 unused bits
 D=["ld", "st"]
 E=["jlt", "jmp", "jgt", "je"] #3 unused bits
 F=["hlt"] #11 unused bits
+
+def float_converter(n):
+    f=n%1
+    w=n//1
+    w=bin(int(w))
+    w=w[2:]
+    x=""
+    for i in range(0,4):
+        f*=2
+        if f>=1:
+            f=f%1
+            x+="1"
+        else:
+            f*=2
+            x+="0"
+    y=""
+    y+=str(w)+"."+x
+    return y
+
+def isfloat(str):
+    check=1
+    for i in str:
+        if(i!="." and (i<"0" or i>"9")):
+            check=0
+            break
+    return check
+
+
+def float_ieee(f):
+    pos=f.index(".")
+    f=f[1:6]
+    exp=bin(pos-1)
+    exp=exp[2:]
+    diff=3-len(exp)
+    exp="0"*diff + exp
+    res=exp + f[0:pos] + f[pos+1:]
+    return res
 
 def decimal_binary(n):
     res=0
@@ -25,6 +62,7 @@ def decimal_binary(n):
     return num
 
 Var=[]
+
 Label={}
 Output=[]
 
@@ -131,7 +169,14 @@ for i in range(0, len(S)):
                     error=1
                     break
                 elif(L[2] not in Reg):
-                    if(L[2][0]=="$"):
+                    if(L[2][0]=="$" and L[0]=="movf"):
+                        if(isfloat(L[2][1::])==0):
+                            error=1
+                            break
+                        elif (float(L[2][1::])>252 or float(L[2][1::])<0):
+                            error=5
+                            break
+                    elif(L[2][0]=="$" and L[0]!="movf"):                            
                         if(not L[2][1::].isdigit()):
                             error=1
                             break
@@ -180,7 +225,9 @@ for i in range(0, len(S)):
                     break
             for j in L:
                 if j!=op:
-                    if j[0]=="$":
+                    if j[0]=="$" and L[0]=="movf":
+                        res+=float_ieee(float_converter(float(j[1::])))
+                    elif j[0]=="$" and L[0]!="movf":
                         res+=decimal_binary(int(j[1::]))
                     elif j in Var:
                         y=lines+(Var.index(j)+1)
